@@ -1,34 +1,27 @@
 import React from 'react';
 import './App.css'
-class Square extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-    render() {
-        return (
-            <button className="square" onClick={() => {this.props.onClick()}}>
-                {this.props.value}
-            </button>
-        )
-    }
+function Square(props) {
+    return (
+        <button className="square" onClick={props.onClick}>
+            {props.value}
+        </button>
+    )
 }
 
 class Board extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            squares: Array(9).fill(null)
-        }
     }
 
     handleClick(i) {
-        const squares = this.state.squares.slice();
-        squares[i] = 'X';
-        this.setState({squares: squares});
+        // const squares = this.state.squares.slice();
+        // squares[i] = this.state.isXNext ? 'X' : 'O';
+        // const isXNext = !this.state.isXNext;
+        // this.setState({squares: squares, isXNext});
     }
 
     renderSquare(i) {
-        return <Square value={this.state.squares[i]} onClick={() => this.handleClick(i)}></Square>
+        return <Square value={this.props.squares[i]} onClick={() => this.props.onSquareClick(i)}></Square>
     }
     render() {
         const status = 'Next player: X';
@@ -57,11 +50,35 @@ class Board extends React.Component {
 }
 
 class Game extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            history: [{
+                squares: Array(9).fill(null)
+            }],
+            xIsNext: true
+        }
+    }
+
+    onSquareClick(i) {
+        console.log('on square click', i);
+        const current = this.state.history[this.state.history.length -1];
+        const cloneCurrentSquares = current.squares.slice();
+        cloneCurrentSquares[i] = 'X';
+        const history = this.state.history;
+        this.setState({
+            history: history.concat([{
+                squares: cloneCurrentSquares
+            }]),
+            xIsNext: !this.state.xIsNext,
+        })
+    }
     render() {
+        const current = this.state.history[this.state.history.length -1];
         return (
             <div className="game">
                 <div className="game-board">
-                    <Board />
+                    <Board squares={current.squares} onSquareClick={(i) => this.onSquareClick(i)} />
                 </div>
                 <div className="game-info">
                     <div>{/* status */}</div>
